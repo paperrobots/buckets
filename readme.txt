@@ -40,6 +40,9 @@ You can view the documentation here: https://docs.google.com/document/d/1fDhqmtK
 
 
 == Changelog ==
+= 0.3.5 =
+[Fixed] - Buckets errors out if ACF is installed but Flexible Content field wasn't. Buckets will fallback to it's WYSIWYG mode now.
+
 = 0.3.4 =
 [Fixed] - ACF function acf_force_type_array was changed to acf_get_array in Buckets Sidebar field
 
