@@ -40,6 +40,20 @@ You can view the documentation here: https://docs.google.com/document/d/1fDhqmtK
 
 
 == Changelog ==
+= 0.3.7 =
+[Fixed] - Conflict with ACF v4 Relationship Field. Now loading scripts for each version seperately.
+[Fixed] - Cleaned up some styles on the Sidebar field.
+[Fixed] - Styles and Javascript weren't loading properly on ACF Options page.
+[Fixed] - Add/Edit on Page feature for ACF v4 to match the ACF v5 version with Front End Fields. Much more stable!
+[Added] - Updated the buckets output to use the more up to date have_rows() function from ACF.
+
+
+= 0.3.5 =
+[Fixed] - Buckets errors out if ACF is installed but Flexible Content field wasn't. Buckets will fallback to it's WYSIWYG mode now.
+
+= 0.3.4 =
+[Fixed] - ACF function acf_force_type_array was changed to acf_get_array in Buckets Sidebar field
+
 = 0.3.3 =
 [Added] - Ability to use custom variables in your shortcodes. Thanks to user summatix! This allows shortcodes to be called like [bucket id="1234" title="My Bucket" myvar="myvalue"]. Inside buckets you can use %%myvar%% to access the custom variable.
 
