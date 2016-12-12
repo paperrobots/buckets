@@ -40,6 +40,9 @@ You can view the documentation here: https://docs.google.com/document/d/1fDhqmtK
 
 
 == Changelog ==
+= 0.3.8 =
+[Fixed] - Javascript issue pulling buckets in sidebar field after new ACF 5.5.2 update
+
 = 0.3.7 =
 [Fixed] - Conflict with ACF v4 Relationship Field. Now loading scripts for each version seperately.
 [Fixed] - Cleaned up some styles on the Sidebar field.
