@@ -2,8 +2,8 @@
 Contributors: matthewordie
 Tags: widgets, buckets, acf, advanced custom fields, custom, field, widgets alternative, sidebar
 Requires at least: 3.0
-Tested up to: 3.4.1
-Stable tag: 3.4.1
+Tested up to: 4.8.2
+Stable tag: 4.8.2
 
 A widgets alternative that lets you place content anywhere easily.
 
