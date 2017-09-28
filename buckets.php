@@ -177,9 +177,10 @@ function include_field_types_buckets()
 {
     global $acf_version;
     remove_post_type_support('buckets', 'editor');
-    include_once WP_PLUGIN_DIR.'/buckets/fields/acf-buckets-v'.$acf_version.'.php';
+    include_once plugin_dir_path(__FILE__).'/fields/acf-buckets-v'.$acf_version.'.php';
     create_bucket_field_groups($acf_version);
 }
+
 // If ACF is loaded
 if (is_plugin_active('advanced-custom-fields-pro/acf.php')) {
     add_action('acf/include_field_types', 'include_field_types_buckets');
@@ -506,7 +507,7 @@ function get_bucket($bucket_id)
             $layout = get_row_layout();
 
             $file = str_replace(' ', '', $layout).'.php';
-            $path = (file_exists(TEMPLATEPATH.'/buckets/'.$file)) ? TEMPLATEPATH.'/buckets/'.$file : WP_PLUGIN_DIR.'/buckets/templates/'.$file;
+            $path = (file_exists(TEMPLATEPATH.'/buckets/'.$file)) ? TEMPLATEPATH.'/buckets/'.$file : plugin_dir_path(__FILE__).'/templates/'.$file;
             if (file_exists($path)) {
                 include $path;
             } else {
