@@ -40,6 +40,10 @@ You can view the documentation here: https://docs.google.com/document/d/1fDhqmtK
 
 
 == Changelog ==
+= 0.3.9 =
+[Fixed] - Fixed some styling issues on the bucket field.
+[Fixed] - Had an issue where Bucket pages were showing up in google results. Especialy if using an SEO plugin. Changed how the custom post type is setup. Using publicly_queryable set to false. This hides it from plugins like Yoast. If you run into any issues with this please make a posts on the forums or contact me on my website. https://matthewrestorff.com
+
 = 0.3.8 =
 [Fixed] - Javascript issue pulling buckets in sidebar field after new ACF 5.5.2 update
 

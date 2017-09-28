@@ -4,7 +4,7 @@ Plugin Name: Buckets
 Plugin URI: http://www.matthewrestorff.com
 Description: A Widget Alternative. Add reusable content inside of content. On a per page basis.
 Author: Matthew Restorff
-Version: 0.3.8
+Version: 0.3.9
 Author URI: http://www.matthewrestorff.com
 */
 
@@ -15,7 +15,7 @@ Author URI: http://www.matthewrestorff.com
 *	@author Matthew Restorff
 *
 *-------------------------------------------------------------------------------------*/
-$bucket_version = '0.3.8';
+$bucket_version = '0.3.9';
 add_action('init', 'buckets_init');
 add_action('admin_head', 'buckets_admin_head');
 add_shortcode('bucket', 'buckets_shortcode');
@@ -53,7 +53,6 @@ function buckets_init()
 
     register_post_type('buckets', array(
         'labels' => $labels,
-        'public' => true,
         'show_ui' => true,
         'menu_icon' => $icon_svg,
         '_builtin' => false,
@@ -66,6 +65,8 @@ function buckets_init()
             'title', 'editor', 'revisions',
         ),
         'show_in_menu' => true,
+        'show_in_nav_menu' => true,
+        'publicly_queryable' => false,
     ));
 }
 
