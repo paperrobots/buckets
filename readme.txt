@@ -2,8 +2,8 @@
 Contributors: matthewordie
 Tags: widgets, buckets, acf, advanced custom fields, custom, field, widgets alternative, sidebar
 Requires at least: 3.0
-Tested up to: 3.4.1
-Stable tag: 3.4.1
+Tested up to: 4.8.2
+Stable tag: 4.8.2
 
 A widgets alternative that lets you place content anywhere easily.
 
@@ -40,6 +40,9 @@ You can view the documentation here: https://docs.google.com/document/d/1fDhqmtK
 
 
 == Changelog ==
+= 0.3.10 = 
+[Fixed] - Buckets sidebar field broke on the free version of ACF when it updated to version 5. 
+
 = 0.3.9 =
 [Fixed] - Fixed some styling issues on the bucket field.
 [Fixed] - Had an issue where Bucket pages were showing up in google results. Especialy if using an SEO plugin. Changed how the custom post type is setup. Using publicly_queryable set to false. This hides it from plugins like Yoast. If you run into any issues with this please make a posts on the forums or contact me on my website. https://matthewrestorff.com
