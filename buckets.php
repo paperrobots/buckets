@@ -4,7 +4,7 @@ Plugin Name: Buckets
 Plugin URI: http://www.matthewrestorff.com
 Description: A Widget Alternative. Add reusable content inside of content. On a per page basis.
 Author: Matthew Restorff
-Version: 0.3.8
+Version: 0.3.10
 Author URI: http://www.matthewrestorff.com
 */
 
@@ -15,7 +15,7 @@ Author URI: http://www.matthewrestorff.com
 *	@author Matthew Restorff
 *
 *-------------------------------------------------------------------------------------*/
-$bucket_version = '0.3.8';
+$bucket_version = '0.3.10';
 add_action('init', 'buckets_init');
 add_action('admin_head', 'buckets_admin_head');
 add_shortcode('bucket', 'buckets_shortcode');
@@ -23,7 +23,42 @@ add_action('add_meta_boxes', 'bucket_shortcode_meta_box', 10, 1);
 add_filter('manage_edit-buckets_columns', 'bucket_columns');
 add_filter('contextual_help', 'add_bucket_help_tab', 10, 2);
 add_action('manage_buckets_posts_custom_column', 'bucket_columns_content', 10, 2);
-include_once ABSPATH.'wp-admin/includes/plugin.php'; //used for is_plugin_active function
+
+/*--------------------------------------------------------------------------------------
+*
+*
+* ACF Register Custom Fields
+*
+*-------------------------------------------------------------------------------------*/
+$acf_version = get_option('acf_version');
+// For ACF Version 5.0.0 or higher
+add_action('acf/include_field_types', 'include_field_types_buckets');
+// For ACF Verion 4.9.9 or lower
+add_action('acf/register_fields', 'include_field_types_buckets');
+
+// Checks the ACF Version to determines which acf field template to use. 
+// Returns 5 for any versions 5.0.0 and up or 4 for any older versions. 
+function getAcfFieldVersion(){
+    global $acf_version;
+    return (version_compare($acf_version, '5.0.0', '>=')) ? 5 : 4;
+}
+
+// Checks if ACF is an active plugin
+function isAcfActive() {
+    
+    // Array of current active plugins in WP
+    $active_plugins = get_option('active_plugins');
+
+    // ACF has two versions of their plugin which could be active
+    $acf_files = array('advanced-custom-fields/acf.php', 'advanced-custom-fields-pro/acf.php');
+
+    foreach ($acf_files as $f) {
+        if (in_array($f, $active_plugins)) {
+        	return true;
+        }
+    }
+    return false;
+}
 
 /*--------------------------------------------------------------------------------------
 *
@@ -53,7 +88,6 @@ function buckets_init()
 
     register_post_type('buckets', array(
         'labels' => $labels,
-        'public' => true,
         'show_ui' => true,
         'menu_icon' => $icon_svg,
         '_builtin' => false,
@@ -66,6 +100,8 @@ function buckets_init()
             'title', 'editor', 'revisions',
         ),
         'show_in_menu' => true,
+        'show_in_nav_menu' => true,
+        'publicly_queryable' => false,
     ));
 }
 
@@ -175,18 +211,17 @@ function add_bucket_help_tab()
 function include_field_types_buckets()
 {
     global $acf_version;
+
+    //Sets which buckets field version we should use
+    $v = getAcfFieldVersion();
+
     remove_post_type_support('buckets', 'editor');
-    include_once WP_PLUGIN_DIR.'/buckets/fields/acf-buckets-v'.$acf_version.'.php';
-    create_bucket_field_groups($acf_version);
+    
+    include_once WP_PLUGIN_DIR.'/buckets/fields/acf-buckets-v'.$v.'.php';
+
+    create_bucket_field_groups($v);
 }
-// If ACF is loaded
-if (is_plugin_active('advanced-custom-fields-pro/acf.php')) {
-    add_action('acf/include_field_types', 'include_field_types_buckets');
-    $acf_version = '5';
-} elseif (is_plugin_active('advanced-custom-fields/acf.php') && is_plugin_active('acf-flexible-content/acf-flexible-content.php')) {
-    add_action('acf/register_fields', 'include_field_types_buckets');
-    $acf_version = '4';
-}
+
 
 /*--------------------------------------------------------------------------------------
 *
@@ -406,17 +441,27 @@ function buckets_admin_head()
 {
     global $bucket_version, $acf_version;
 
+    // Enqueue Styles for Bucket Posts
     if (isset($GLOBALS['post_type']) && $GLOBALS['post_type'] == 'buckets') {
         wp_enqueue_style('buckets', plugins_url('', __FILE__).'/css/buckets.css?v='.$bucket_version);
     }
 
+    // On edit screen for a post
+    // TODO How is this different than the above code? What are acf-options for? 
     if ($GLOBALS['pagenow'] == 'post.php' || (isset($GLOBALS['_GET']['page']) && $GLOBALS['_GET']['page'] == 'acf-options')) {
-        wp_enqueue_style('bucket-field', plugins_url('', __FILE__).'/css/bucket_field.css?v='.$bucket_version, array('thickbox'));
+        
+        // Buckets Scripts
         wp_enqueue_script('buckets', plugins_url('', __FILE__).'/js/buckets.js?v='.$bucket_version);
+        
+        // If ACF is active load ACF specific scripts
+        if (isAcfActive()){
+            // Buckets field styles
+            wp_enqueue_style('bucket-field', plugins_url('', __FILE__).'/css/bucket_field.css?v='.$bucket_version, array('thickbox'));
+            // Buckets field script
+            wp_enqueue_script('bucket-field-script', plugins_url('', __FILE__).'/js/bucket_field_v' . $acf_version . '.js?v='.$bucket_version, array('jquery-ui-sortable'));
+        }
     }
-    if (!empty($acf_version)){
-        wp_enqueue_script('bucket-field-script', plugins_url('', __FILE__).'/js/bucket_field_v' . $acf_version . '.js?v='.$bucket_version, array('jquery-ui-sortable'));
-    }
+
 
     // The WP Thickbox dimensions are hard coded into the media-upload. With this we strip it and make our own.
     wp_deregister_script('media-upload');
@@ -484,6 +529,8 @@ function get_bucket_type($bucket_id)
     return substr($type, 0, -2);
 }
 
+
+
 /*--------------------------------------------------------------------------------------
 *
 *	get_bucket
@@ -495,11 +542,12 @@ function get_bucket_type($bucket_id)
 *-------------------------------------------------------------------------------------*/
 
 function get_bucket($bucket_id)
-{
+{   
+    // Return the Post Content by default
     $return = apply_filters('the_content', get_post_field('post_content', $bucket_id));
-
-    //If ACF is Active perform some wizardry
-    if ((is_plugin_active('advanced-custom-fields/acf.php') && is_plugin_active('acf-flexible-content/acf-flexible-content.php')) || is_plugin_active('advanced-custom-fields-pro/acf.php')) {
+    
+    //Is ACF is Active
+    if (isAcfActive()) {
         while ( have_rows('buckets', $bucket_id) ) { the_row();
             ob_start();
             $layout = get_row_layout();

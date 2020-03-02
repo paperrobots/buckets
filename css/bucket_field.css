@@ -122,6 +122,15 @@
     color: #ccc;
 }
 
+.acf-relationship.acf-buckets .filters .filter {
+    box-shadow: none;
+    border-color: transparent;
+    height: 28px;
+    line-height: 28px;
+    padding: 2px;
+    margin: 7px 7px 0;
+}
+
 .acf_buckets .relationship_list li .edit.v4:hover {
     color: #2ea2cc;
 }
@@ -176,7 +185,7 @@
 }
 
 .new-bucket-button, .new-bucket {
-    margin: 6px 6px 0 0 !important;
+    margin: 7px 7px 7px 0 !important;
 }
 
 .new-bucket-button {
