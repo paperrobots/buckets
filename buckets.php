@@ -553,7 +553,7 @@ function get_bucket($bucket_id)
             $layout = get_row_layout();
 
             $file = str_replace(' ', '', $layout).'.php';
-            $path = (file_exists(TEMPLATEPATH.'/buckets/'.$file)) ? TEMPLATEPATH.'/buckets/'.$file : WP_PLUGIN_DIR.'/buckets/templates/'.$file;
+            $path = (file_exists(TEMPLATEPATH.'/buckets/'.$file)) ? TEMPLATEPATH.'/buckets/'.$file : plugin_dir_path(__FILE__).'/templates/'.$file;
             if (file_exists($path)) {
                 include $path;
             } else {
