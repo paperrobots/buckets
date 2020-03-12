@@ -31,17 +31,16 @@ add_action('manage_buckets_posts_custom_column', 'bucket_columns_content', 10, 2
 *
 *-------------------------------------------------------------------------------------*/
 $acf_version = get_option('acf_version');
+
+//Sets which buckets field version we should use
+$bucketsFieldVersion = (version_compare($acf_version, '5.0.0', '>=')) ? 5 : 4;
+
 // For ACF Version 5.0.0 or higher
 add_action('acf/include_field_types', 'include_field_types_buckets');
 // For ACF Verion 4.9.9 or lower
 add_action('acf/register_fields', 'include_field_types_buckets');
 
-// Checks the ACF Version to determines which acf field template to use. 
-// Returns 5 for any versions 5.0.0 and up or 4 for any older versions. 
-function getAcfFieldVersion(){
-    global $acf_version;
-    return (version_compare($acf_version, '5.0.0', '>=')) ? 5 : 4;
-}
+
 
 // Checks if ACF is an active plugin
 function isAcfActive() {
@@ -210,16 +209,14 @@ function add_bucket_help_tab()
 *-------------------------------------------------------------------------------------*/
 function include_field_types_buckets()
 {
-    global $acf_version;
-
-    //Sets which buckets field version we should use
-    $v = getAcfFieldVersion();
-
+    global $bucketsFieldVersion;
+    // Unload the default visual editor if ACF is detected
     remove_post_type_support('buckets', 'editor');
     
-    include_once WP_PLUGIN_DIR.'/buckets/fields/acf-buckets-v'.$v.'.php';
+    include_once WP_PLUGIN_DIR.'/buckets/fields/acf-buckets-v' . $bucketsFieldVersion . '.php';
 
-    create_bucket_field_groups($v);
+    // Setup the default Field Groups (Buckets, Sidebars)
+    create_bucket_field_groups($bucketsFieldVersion);
 }
 
 
@@ -232,7 +229,7 @@ function include_field_types_buckets()
 *-------------------------------------------------------------------------------------*/
 function buckets_pre_save_post( $post_id ) {
 
-    // check if this is to be a new post
+    // check if this is a new post
     if( $post_id != 'new_post' )
     {
         return $post_id;
@@ -305,10 +302,10 @@ function bucket_register_tinymce_button($buttons)
 *	@author Matthew Restorff
 *
 *-------------------------------------------------------------------------------------*/
-function create_bucket_field_groups($acf_version)
+function create_bucket_field_groups($bucketFieldVersion)
 {
     // ACF Pro v5+
-    if (intval($acf_version) >= 5) {
+    if (intval($bucketsFieldVersion) >= 5) {
         $args = array(
           'name' => 'group_buckets',
           'post_type' => 'acf-field-group',
@@ -383,7 +380,7 @@ function create_bucket_field_groups($acf_version)
             );
             $buckets_sidebar_field_group_field_id = wp_insert_post($buckets_sidebar_field_group_field);
         }
-    } elseif ($acf_version == '4') {
+    } elseif ($bucketsFieldVersion == '4') {
         $args = array(
           'name' => 'acf_buckets',
           'post_type' => 'acf',
@@ -439,7 +436,7 @@ function create_bucket_field_groups($acf_version)
 
 function buckets_admin_head()
 {
-    global $bucket_version, $acf_version;
+    global $bucket_version, $bucketsFieldVersion;
 
     // Enqueue Styles for Bucket Posts
     if (isset($GLOBALS['post_type']) && $GLOBALS['post_type'] == 'buckets') {
@@ -448,6 +445,7 @@ function buckets_admin_head()
 
     // On edit screen for a post
     // TODO How is this different than the above code? What are acf-options for? 
+    // TODO fix the js error message
     if ($GLOBALS['pagenow'] == 'post.php' || (isset($GLOBALS['_GET']['page']) && $GLOBALS['_GET']['page'] == 'acf-options')) {
         
         // Buckets Scripts
@@ -458,7 +456,7 @@ function buckets_admin_head()
             // Buckets field styles
             wp_enqueue_style('bucket-field', plugins_url('', __FILE__).'/css/bucket_field.css?v='.$bucket_version, array('thickbox'));
             // Buckets field script
-            wp_enqueue_script('bucket-field-script', plugins_url('', __FILE__).'/js/bucket_field_v' . $acf_version . '.js?v='.$bucket_version, array('jquery-ui-sortable'));
+            wp_enqueue_script('bucket-field-script', plugins_url('', __FILE__).'/js/bucket_field_v' . $bucketsFieldVersion . '.js?v='.$bucket_version, array('jquery-ui-sortable'));
         }
     }
 
